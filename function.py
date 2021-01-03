@@ -60,25 +60,28 @@ def sigmoid(x):
 
 # returns an an n-day state representation ending at time t
 def getState(stockname,mode, t, n):
-    dataopen = getStockDataVec(stockname, mode)[0]
-    datahigh = getStockDataVec(stockname, mode)[1]
-    datalow = getStockDataVec(stockname, mode)[2]
+    #dataopen = getStockDataVec(stockname, mode)[0]
+    #datahigh = getStockDataVec(stockname, mode)[1]
+    #datalow = getStockDataVec(stockname, mode)[2]
     dataclose = getStockDataVec(stockname, mode)[3]
     #d = t - n + 1
     #block = data[d:t + 1] if d >= 0 else -d * [data[0]] + data[0:t + 1] # pad with t0
-    blockopen = dataopen[t-n:t]
-    blockhigh = datahigh[t-n:t]
-    blocklow = datalow[t-n:t]
+    
+    #blockopen = dataopen[t-n:t]
+    #blockhigh = datahigh[t-n:t]
+    #blocklow = datalow[t-n:t]
     blockclose = dataclose[t-n:t]
     resopen,reshigh,reslow,resclose = [],[],[],[]
     for i in range(n-1):
-        resopen.append(sigmoid(blockopen[i + 1] - blockopen[i]))
-        reshigh.append(sigmoid(blockhigh[i + 1] - blockhigh[i]))
-        reslow.append(sigmoid(blocklow[i + 1] - blocklow[i]))
+        #resopen.append(sigmoid(blockopen[i + 1] - blockopen[i]))
+        #reshigh.append(sigmoid(blockhigh[i + 1] - blockhigh[i]))
+        #reslow.append(sigmoid(blocklow[i + 1] - blocklow[i]))
         resclose.append(sigmoid(blockclose[i + 1] - blockclose[i]))
 
     #return np.array([resopen,reshigh,reslow,resclose])
-    return np.array([blockopen[:-1],blockhigh[:-1],blocklow[:-1],blockclose[:-1]])
+    #return np.array([blockopen[:-1],blockhigh[:-1],blocklow[:-1],blockclose[:-1]])
+    #return np.array([resopen,resclose])
+    return np.array([resclose])
 
 
 # In[ ]:

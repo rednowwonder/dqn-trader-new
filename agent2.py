@@ -75,9 +75,9 @@ class TrainAgent:
         action_batch = torch.LongTensor(batch.action).to(device)
         reward_batch = torch.FloatTensor(batch.reward).to(device)
         non_final_next_states = non_final_next_states.unsqueeze(1)
-        print('22',non_final_next_states)
-        non_final_next_states = non_final_next_states.view(self.batch_size,4,self.state_size)
-        print('33',non_final_next_states)
+        #print('22',non_final_next_states)
+        #non_final_next_states = non_final_next_states.view(self.batch_size,4,self.state_size)
+        #print('33',non_final_next_states)
         #print(state_batch.size())
         #print(non_final_next_states.size())
         
@@ -99,7 +99,7 @@ class TrainAgent:
 
         # Compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
-        
+        #print('loss :', loss)
         # Optimize the model
         self.optimizer.zero_grad()
         loss.backward()
@@ -131,8 +131,8 @@ class ValidationAgent:
             self.policy_net = torch.load('models/policy_model'+f'_{self.num}', map_location=device)
             self.target_net = torch.load('models/target_model'+f'_{self.num}', map_location=device)
         else:
-            self.policy_net = LSTM(state_size, 16, 2, self.action_size)
-            self.target_net = LSTM(state_size, 16, 2, self.action_size)
+            self.policy_net = LSTM(state_size, 32, 2, self.action_size)
+            self.target_net = LSTM(state_size, 32, 2, self.action_size)
         self.optimizer = optim.RMSprop(self.policy_net.parameters(), lr=0.005, momentum=0.9)
 
 
@@ -166,6 +166,9 @@ class ValidationAgent:
         state_batch = torch.FloatTensor(batch.state).to(device)
         action_batch = torch.LongTensor(batch.action).to(device)
         reward_batch = torch.FloatTensor(batch.reward).to(device)
+        
+        non_final_next_states = non_final_next_states.unsqueeze(1)
+        non_final_next_states = non_final_next_states.view(self.batch_size,4,self.state_size)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken
@@ -184,7 +187,7 @@ class ValidationAgent:
 
         # Compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
-
+        
         # Optimize the model
         self.optimizer.zero_grad()
         loss.backward()

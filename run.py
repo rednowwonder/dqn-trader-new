@@ -18,7 +18,7 @@ from train_function_當沖 import train_function_daytrade
 from validation_function_當沖 import no_greedy_daytrade,bestepoch_daytrade
 from plot_function_當沖 import plot_function_daytrade
 
-
+stockname = 'DJI_F'
 # In[3]:
 
 
@@ -28,9 +28,9 @@ totalreturn1 = []
 tradenum1 = []
 bestepoch1 = []
 for i in range(5):
-    train_function()
-    recordtrain = no_greedy('train')
-    recordtest = no_greedy('valid')
+    train_function(stockname,'train')
+    recordtrain = no_greedy(stockname,'train')
+    recordtest = no_greedy(stockname,'valid')
     out = bestepoch(recordtrain,recordtest,i,1)
     totalreturn1.append(out[0])
     tradenum1.append(out[1])
@@ -68,9 +68,9 @@ totalreturn3 = []
 tradenum3 = []
 bestepoch3 = []
 for i in range(5):
-    train_function_daytrade()
-    recordtrain = no_greedy_daytrade('train')
-    recordtest = no_greedy_daytrade('valid')
+    train_function_daytrade(stockname,'train')
+    recordtrain = no_greedy_daytrade(stockname,'train')
+    recordtest = no_greedy_daytrade(stockname,'valid')
     out = bestepoch_daytrade(recordtrain,recordtest,i,3)
     totalreturn3.append(out[0])
     tradenum3.append(out[1])

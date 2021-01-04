@@ -98,5 +98,3 @@ def plot_function_daytrade(num,mode):
 # In[ ]:
 
 
-
-

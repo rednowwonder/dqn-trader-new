@@ -41,8 +41,8 @@ class TrainAgent:
             self.policy_net = torch.load('models/policy_model', map_location=device)
             self.target_net = torch.load('models/target_model', map_location=device)
         else:
-            self.policy_net = LSTM(state_size, 32, 2, self.action_size)
-            self.target_net = LSTM(state_size, 32, 2, self.action_size)
+            self.policy_net = LSTM(state_size, 16, 2, self.action_size)
+            self.target_net = LSTM(state_size, 16, 2, self.action_size)
             
         self.optimizer = optim.RMSprop(self.policy_net.parameters(), lr=0.005, momentum=0.9)
 
@@ -76,7 +76,7 @@ class TrainAgent:
         reward_batch = torch.FloatTensor(batch.reward).to(device)
         non_final_next_states = non_final_next_states.unsqueeze(1)
         #print('22',non_final_next_states)
-        #non_final_next_states = non_final_next_states.view(self.batch_size,4,self.state_size)
+        non_final_next_states = non_final_next_states.view(self.batch_size,2,self.state_size)
         #print('33',non_final_next_states)
         #print(state_batch.size())
         #print(non_final_next_states.size())
@@ -131,8 +131,8 @@ class ValidationAgent:
             self.policy_net = torch.load('models/policy_model'+f'_{self.num}', map_location=device)
             self.target_net = torch.load('models/target_model'+f'_{self.num}', map_location=device)
         else:
-            self.policy_net = LSTM(state_size, 32, 2, self.action_size)
-            self.target_net = LSTM(state_size, 32, 2, self.action_size)
+            self.policy_net = LSTM(state_size, 16, 2, self.action_size)
+            self.target_net = LSTM(state_size, 16, 2, self.action_size)
         self.optimizer = optim.RMSprop(self.policy_net.parameters(), lr=0.005, momentum=0.9)
 
 
@@ -168,7 +168,7 @@ class ValidationAgent:
         reward_batch = torch.FloatTensor(batch.reward).to(device)
         
         non_final_next_states = non_final_next_states.unsqueeze(1)
-        non_final_next_states = non_final_next_states.view(self.batch_size,4,self.state_size)
+        non_final_next_states = non_final_next_states.view(self.batch_size,2,self.state_size)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken

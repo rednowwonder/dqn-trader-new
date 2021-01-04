@@ -14,15 +14,16 @@ from tqdm import trange
 
 def train_function(stockname, mode):
     window_size = 20
-    episode_count = 100
+    episode_count = 50
     agent = TrainAgent(window_size)
-    dataclose = getStockDataVec(stockname, mode)[3]
-    dataopen = getStockDataVec(stockname, mode)[0]
+    data = getStockDataVec(stockname, mode)
+    dataclose = data[1]
+    dataopen = data[0]
     l = len(dataclose)
 
     for e in trange(episode_count):
 #         print("Episode " + str(e+1) + "/" + str(episode_count))
-        state = getState(stockname, mode, window_size + 1, window_size + 1)
+        state = getState(data, window_size + 1, window_size + 1)
         total_profit = 0
         agent.inventory = []
         actionlist = window_size*[None]
@@ -46,7 +47,7 @@ def train_function(stockname, mode):
                 agent.epsilon = agent.epsilon * agent.epsilon_decay
             else:
                 agent.epsilon = agent.epsilon_min
-            next_state = getState(stockname, mode, t + 1 , window_size + 1)
+            next_state = getState(data, t + 1 , window_size + 1)
             done = True if t == l - 1 else False
             agent.memory.push(state, action, next_state, reward)
             state = next_state

@@ -35,21 +35,21 @@ def getStockDataVec(key,mode):
     if mode == 'train':
         closes = closes[:math.ceil(len(closes)*0.6)]
         opens = opens[:math.ceil(len(opens)*0.6)]
-        highs = highs[:math.ceil(len(highs)*0.6)]
-        lows = lows[:math.ceil(len(lows)*0.6)]
+        #highs = highs[:math.ceil(len(highs)*0.6)]
+        #lows = lows[:math.ceil(len(lows)*0.6)]
     if mode == 'valid':
         closes = closes[math.ceil(len(closes)*0.6):math.ceil(len(closes)*0.8)]
         opens = opens[math.ceil(len(opens)*0.6):math.ceil(len(opens)*0.8)]
-        highs = highs[math.ceil(len(highs)*0.6):math.ceil(len(highs)*0.8)]
-        lows = lows[math.ceil(len(lows)*0.6):math.ceil(len(lows)*0.8)]
+        #highs = highs[math.ceil(len(highs)*0.6):math.ceil(len(highs)*0.8)]
+        #lows = lows[math.ceil(len(lows)*0.6):math.ceil(len(lows)*0.8)]
     if mode == 'test':
         closes = closes[math.ceil(len(closes)*0.8):]
         opens = opens[math.ceil(len(opens)*0.8):]
-        highs = highs[math.ceil(len(highs)*0.8):]
-        lows = lows[math.ceil(len(lows)*0.8):]
+        #highs = highs[math.ceil(len(highs)*0.8):]
+        #lows = lows[math.ceil(len(lows)*0.8):]
     if mode == 'all':
-        return  [opens, highs, lows, closes]
-    return [opens, highs, lows, closes]
+        return  [opens, closes]#, highs, lows
+    return [opens, closes]#, highs, lows
 
 # returns the sigmoid
 def sigmoid(x):
@@ -59,29 +59,29 @@ def sigmoid(x):
         return np.exp(x)/(1 + np.exp(x))
 
 # returns an an n-day state representation ending at time t
-def getState(stockname,mode, t, n):
-    #dataopen = getStockDataVec(stockname, mode)[0]
+def getState(data, t, n):
+    dataopen = data[0]
     #datahigh = getStockDataVec(stockname, mode)[1]
     #datalow = getStockDataVec(stockname, mode)[2]
-    dataclose = getStockDataVec(stockname, mode)[3]
+    dataclose = data[1]
     #d = t - n + 1
     #block = data[d:t + 1] if d >= 0 else -d * [data[0]] + data[0:t + 1] # pad with t0
     
-    #blockopen = dataopen[t-n:t]
+    blockopen = dataopen[t-n:t]
     #blockhigh = datahigh[t-n:t]
     #blocklow = datalow[t-n:t]
     blockclose = dataclose[t-n:t]
     resopen,reshigh,reslow,resclose = [],[],[],[]
     for i in range(n-1):
-        #resopen.append(sigmoid(blockopen[i + 1] - blockopen[i]))
+        resopen.append(sigmoid(blockopen[i + 1] - blockopen[i]))
         #reshigh.append(sigmoid(blockhigh[i + 1] - blockhigh[i]))
         #reslow.append(sigmoid(blocklow[i + 1] - blocklow[i]))
         resclose.append(sigmoid(blockclose[i + 1] - blockclose[i]))
 
     #return np.array([resopen,reshigh,reslow,resclose])
     #return np.array([blockopen[:-1],blockhigh[:-1],blocklow[:-1],blockclose[:-1]])
-    #return np.array([resopen,resclose])
-    return np.array([resclose])
+    return np.array([resopen,resclose])
+    #return np.array([resclose])
 
 
 # In[ ]:

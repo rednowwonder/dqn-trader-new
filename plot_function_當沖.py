@@ -15,13 +15,13 @@ import math
 # In[18]:
 
 
-def plot_function_daytrade(num,mode):
+def plot_function_daytrade(num,mode,key):
     def load_variable(filename):
         f=open(filename,'rb')
         r=pickle.load(f)
         f.close()
         return r
-    
+            
     if not os.path.isdir('./reward'):
         os.mkdir('./reward')
     x_data = load_variable('x_data')
@@ -29,6 +29,13 @@ def plot_function_daytrade(num,mode):
     buys = load_variable('buys')
     sells = load_variable('sells')
     action = load_variable('action')
+    
+    dateid = []
+    lines = open("data/" + key + ".csv", "r").read().splitlines()
+    for line in lines[1:]:
+        close = line.split(",")[4]
+        if close != 'null':
+            dateid.append(line.split(",")[0])
     
     sss = {
         'closes': Series(closes),
@@ -63,8 +70,17 @@ def plot_function_daytrade(num,mode):
             buyin.append(None)
             sellout.append(None)
         totalreturnlist.append(totalreturn)
+        
+    df =  DataFrame({'dateid' : dateid,'closes' : closes,'totalreturn' : totalreturnlist})
+    df = df.set_index('dateid')
+    df['closes'].plot(grid=1,figsize=(12,9),title=f'{key} index')
+    df['totalreturn'].plot(grid=1,figsize=(12,9))
+    plt.axvline(x=math.ceil(len(closes)*0.6), ymin=0, ymax=1, color = 'red')
+    plt.axvline(x=math.ceil(len(closes)*0.8), ymin=0, ymax=1, color = 'red')
+    plt.savefig(f'./reward/total_return_{mode}_{num}')
+    plt.show()
 
-    fig, ax1 = plt.subplots()
+    '''fig, ax1 = plt.subplots()
     plt.title('Total Return')
     plt.xlabel('Time')
     ax2 = ax1.twinx()
@@ -81,7 +97,7 @@ def plot_function_daytrade(num,mode):
 
     fig.tight_layout()
     plt.savefig(f'./reward/total_return_{mode}_{num}')
-    plt.show()
+    plt.show()'''
     
     totalreward = 0
     for i in range(math.ceil(len(sss)*0.8),len(sss)):

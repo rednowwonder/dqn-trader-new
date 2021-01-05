@@ -15,7 +15,7 @@ import math
 # In[18]:
 
 
-def plot_function(num,mode):
+def plot_function(num,mode,key):
     def load_variavle(filename):
         f=open(filename,'rb')
         r=pickle.load(f)
@@ -29,6 +29,13 @@ def plot_function(num,mode):
     x_data = range(len(closes))
     buys = load_variavle('buys')
     sells = load_variavle('sells')
+    
+    dateid = []
+    lines = open("data/" + key + ".csv", "r").read().splitlines()
+    for line in lines[1:]:
+        close = line.split(",")[4]
+        if close != 'null':
+            dateid.append(line.split(",")[0])
     
     sss = {
     'closes': Series(closes),
@@ -49,8 +56,17 @@ def plot_function(num,mode):
         if sssnull.iloc[i,1] != True and sssnull.iloc[i,2] != True:
             totalreward += sss.iloc[i,2] - sss.iloc[i,1] - 2
         totalrewardlist.append(totalreward + reward)
+        
+    df =  DataFrame({'dateid' : dateid,'closes' : closes,'totalreturn' : totalrewardlist})
+    df = df.set_index('dateid')
+    df['closes'].plot(grid=1,figsize=(12,9),title=f'{key} index')
+    df['totalreturn'].plot(grid=1,figsize=(12,9))
+    plt.axvline(x=math.ceil(len(closes)*0.6), ymin=0, ymax=1, color = 'red')
+    plt.axvline(x=math.ceil(len(closes)*0.8), ymin=0, ymax=1, color = 'red')
+    plt.savefig(f'./reward/total_return_{mode}_{num}')
+    plt.show()
     
-    fig, ax1 = plt.subplots()
+'''    fig, ax1 = plt.subplots()
     plt.title('Total Return')
     plt.xlabel('Time')
     ax2 = ax1.twinx()
@@ -83,7 +99,7 @@ def plot_function(num,mode):
     indexreturn = closes[len(closes)-1] - closes[math.ceil(len(closes)*0.8)-1]
     print('test 時間段的指數報酬 :' + str(indexreturn))
 
-
+'''
 # In[ ]:
 
 

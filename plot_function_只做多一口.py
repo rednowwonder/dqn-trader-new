@@ -66,25 +66,6 @@ def plot_function(num,mode,key):
     plt.savefig(f'./reward/total_return_{mode}_{num}')
     plt.show()
     
-'''    fig, ax1 = plt.subplots()
-    plt.title('Total Return')
-    plt.xlabel('Time')
-    ax2 = ax1.twinx()
-
-    ax1.set_ylabel('DJI index', color='tab:blue')
-    plt.axvline(x=math.ceil(len(closes)*0.6), ymin=0, ymax=1, color = 'red')
-    plt.axvline(x=math.ceil(len(closes)*0.8), ymin=0, ymax=1, color = 'red')
-    ax1.plot(x_data, closes, color='tab:blue', alpha=0.75)
-    ax1.tick_params(axis='y', labelcolor='tab:blue')
-
-    ax2.set_ylabel('Accumulated return', color='black')
-    ax2.plot(x_data, totalrewardlist, color='black', alpha=1)
-    ax2.tick_params(axis='y', labelcolor='black')
-
-    fig.tight_layout()
-    plt.savefig(f'./reward/total_return_{mode}_{num}')
-    plt.show()
-    
     
     totalreturn = 0
     for i in range(math.ceil(len(sssnull)*0.8),len(sssnull)):
@@ -99,7 +80,6 @@ def plot_function(num,mode,key):
     indexreturn = closes[len(closes)-1] - closes[math.ceil(len(closes)*0.8)-1]
     print('test 時間段的指數報酬 :' + str(indexreturn))
 
-'''
 # In[ ]:
 
 

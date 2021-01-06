@@ -28,7 +28,7 @@ class TrainAgent:
         self.inventory = []
         self.is_eval = is_eval
 
-        self.gamma = 0.95
+        self.gamma = 0.9
         self.epsilon = 1.0
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
@@ -44,7 +44,7 @@ class TrainAgent:
             self.policy_net = LSTM(state_size, 16, 2, self.action_size)
             self.target_net = LSTM(state_size, 16, 2, self.action_size)
             
-        self.optimizer = optim.RMSprop(self.policy_net.parameters(), lr=0.005, momentum=0.9)
+        self.optimizer = optim.RMSprop(self.policy_net.parameters(), lr=0.001, momentum=0.9)
 
     def act(self, state):
         #print(len(self.memory.memory))
@@ -76,7 +76,7 @@ class TrainAgent:
         reward_batch = torch.FloatTensor(batch.reward).to(device)
         non_final_next_states = non_final_next_states.unsqueeze(1)
         #print('22',non_final_next_states)
-        non_final_next_states = non_final_next_states.view(self.batch_size,2,self.state_size)
+        non_final_next_states = non_final_next_states.view(self.batch_size,4,self.state_size)
         #print('33',non_final_next_states)
         #print(state_batch.size())
         #print(non_final_next_states.size())
@@ -93,13 +93,16 @@ class TrainAgent:
         # state value or 0 in case the state was final.
         next_state_values = torch.zeros(self.batch_size, device=device)
         next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0].detach()
-        
         # Compute the expected Q values
         expected_state_action_values = (next_state_values * self.gamma) + reward_batch
 
         # Compute Huber loss
         loss = F.smooth_l1_loss(state_action_values, expected_state_action_values.unsqueeze(1))
-        #print('loss :', loss)
+        #print(state_action_values.size())
+        #print(expected_state_action_values.size())
+        #print(torch.squeeze(state_action_values))
+        #print(nn.CrossEntropyLoss()(state_action_values,expected_state_action_values.long()))
+        
         # Optimize the model
         self.optimizer.zero_grad()
         loss.backward()
@@ -120,7 +123,7 @@ class ValidationAgent:
         self.is_eval = is_eval
         self.num = num
 
-        self.gamma = 0.95
+        self.gamma = 0.9
         self.epsilon = 1.0
         self.epsilon_min = 0.01
         self.epsilon_decay = 0.995
@@ -133,7 +136,7 @@ class ValidationAgent:
         else:
             self.policy_net = LSTM(state_size, 16, 2, self.action_size)
             self.target_net = LSTM(state_size, 16, 2, self.action_size)
-        self.optimizer = optim.RMSprop(self.policy_net.parameters(), lr=0.005, momentum=0.9)
+        self.optimizer = optim.RMSprop(self.policy_net.parameters(), lr=0.001, momentum=0.9)
 
 
     def act(self, state):
@@ -168,7 +171,7 @@ class ValidationAgent:
         reward_batch = torch.FloatTensor(batch.reward).to(device)
         
         non_final_next_states = non_final_next_states.unsqueeze(1)
-        non_final_next_states = non_final_next_states.view(self.batch_size,2,self.state_size)
+        non_final_next_states = non_final_next_states.view(self.batch_size,4,self.state_size)
 
         # Compute Q(s_t, a) - the model computes Q(s_t), then we select the
         # columns of actions taken. These are the actions which would've been taken

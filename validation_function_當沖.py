@@ -23,11 +23,11 @@ def no_greedy_daytrade(stockname, mode):
     record = []
 
 
-    for ii in trange(1,51):
+    for ii in trange(1,31):
         agent = ValidationAgent(window_size,ii,True)
         #print(agent.policy_net)
         data = getStockDataVec(stockname, mode)
-        dataclose = data[1]
+        dataclose = data[3]
         dataopen = data[0]
         l = len(dataclose)
         #batch_size = 32
@@ -87,7 +87,7 @@ def bestepoch_daytrade(recordtrain,recordtest,num,mode,stockname):
     agent = ValidationAgent(window_size,ii,True)#,True
     #print(agent.policy_net)
     data = getStockDataVec(stockname,'all')
-    dataclose = data[1]
+    dataclose = data[3]
     dataopen = data[0]
     l = len(dataclose)
     #batch_size = 32

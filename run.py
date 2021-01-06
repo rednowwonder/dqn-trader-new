@@ -35,7 +35,7 @@ for i in range(5):
     totalreturn1.append(out[0])
     tradenum1.append(out[1])
     bestepoch1.append(out[2])
-    plot_function(i,1)
+    plot_function(i,1,stockname)
     print('-----------')
 
 
@@ -48,14 +48,14 @@ totalreturn2 = []
 tradenum2 = []
 bestepoch2 = []
 for i in range(5):
-    train_function()
-    recordtrain = no_greedy_daytrade('train')
-    recordtest = no_greedy_daytrade('valid')
+    train_function(stockname,'train')
+    recordtrain = no_greedy_daytrade(stockname,'train')
+    recordtest = no_greedy_daytrade(stockname,'valid')
     out = bestepoch_daytrade(recordtrain,recordtest,i,2,stockname)
     totalreturn2.append(out[0])
     tradenum2.append(out[1])
     bestepoch2.append(out[2])
-    plot_function_daytrade(i,2)
+    plot_function_daytrade(i,2,stockname)
     print('-----------')
 
 
@@ -75,7 +75,7 @@ for i in range(5):
     totalreturn3.append(out[0])
     tradenum3.append(out[1])
     bestepoch3.append(out[2])
-    plot_function_daytrade(i,3)
+    plot_function_daytrade(i,3,stockname)
     print('-----------')
 
 
@@ -95,7 +95,7 @@ for i in range(5):
     totalreturn4.append(out[0])
     tradenum4.append(out[1])
     bestepoch4.append(out[2])
-    plot_function(i,4)
+    plot_function(i,4,stockname)
     print('-----------')
 
 # In[ ]:

@@ -16,7 +16,7 @@ os.environ["KMP_DUPLICATE_LIB_OK"]="TRUE"
 # In[2]:
 
 
-stock_name = '^N225'
+stock_name = 'DJI_2007'
 window_size = 20
 recordtrain = []
 
@@ -24,31 +24,34 @@ recordtrain = []
 for ii in range(1,101):
     agent = ValidationAgent(window_size,ii,True)
     #print(agent.policy_net)
-    dataclose = getStockDataVec(stock_name,900,1)[0]
-    dataopen = getStockDataVec(stock_name,900,1)[1]
+    data = getStockDataVec('DJI_2007','train')
+    dataclose = data[3]
+    dataopen = data[0]
     l = len(dataclose)
     #batch_size = 32
-    state = getState(dataclose, window_size + 1, window_size + 1)
+    state = getState(data, window_size + 1, window_size + 1)
     total_profit = 0
     agent.inventory = []
     tradenum = 0
-    actionlist = window_size*[5] + [agent.act(state)]
+    actionlist = (window_size - 1)*[5]
 
-    for t in range(window_size + 1,l):
+    for t in range(window_size,l):
         reward = 0
+        action = agent.act(state)
+        actionlist.append(action)
 
         if actionlist[t-1] == 0: # buy
-            reward = dataclose[t] - dataopen[t] -1
+            reward = dataclose[t] - dataopen[t] -2
             total_profit += reward
-
+            tradenum += 1
         elif actionlist[t-1] == 1: # sell
-            reward = dataopen[t] - dataclose[t] -1 #手續費
+            reward = dataopen[t] - dataclose[t] -2 #手續費
             total_profit += reward
             tradenum += 1
         
         action = agent.act(state) 
         actionlist.append(action)
-        next_state = getState(dataclose, t + 1, window_size + 1)
+        next_state = getState(data, t + 1, window_size + 1)
         done = True if t == l - 1 else False
         agent.memory.push(state, action, next_state, reward)
         state = next_state
@@ -65,7 +68,7 @@ for ii in range(1,101):
 # In[3]:
 
 
-stock_name = '^N225'
+stock_name = 'DJI_2007'
 window_size = 20
 recordtest = []
 

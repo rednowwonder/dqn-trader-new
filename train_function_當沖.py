@@ -14,10 +14,10 @@ from tqdm import trange
 
 def train_function_daytrade(stockname, mode):
     window_size = 20
-    episode_count = 50
+    episode_count = 30
     agent = TrainAgent(window_size)
     data = getStockDataVec(stockname, mode)
-    dataclose = data[1]
+    dataclose = data[3]
     dataopen = data[0]
     l = len(dataclose)
 

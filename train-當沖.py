@@ -11,10 +11,10 @@ import torch
 # In[2]:
 
 window_size = 20
-episode_count = 100
+episode_count = 500
 agent = TrainAgent(window_size)
 data = getStockDataVec('DJI_2007','train')
-dataclose = data[1]
+dataclose = data[3]
 dataopen = data[0]
 l = len(dataclose)
 buys = window_size*[None]
@@ -27,6 +27,7 @@ for e in range(episode_count):
     total_profit = 0
     agent.inventory = []
     actionlist = window_size*[None]
+    agent.epsilon = 1
     
     for t in range(window_size, l):
         reward = 0
@@ -53,6 +54,7 @@ for e in range(episode_count):
             agent.epsilon = agent.epsilon * agent.epsilon_decay
         else:
             agent.epsilon = agent.epsilon_min
+        #print(agent.epsilon)
         next_state = getState(data, t + 1 , window_size + 1)
         done = True if t == l - 1 else False
         agent.memory.push(state, action, next_state, reward)
@@ -69,68 +71,7 @@ for e in range(episode_count):
         torch.save(agent.policy_net, "models/policy_model_%d"%(e+1))
         torch.save(agent.target_net, "models/target_model_%d"%(e+1))
         
-    sss = {
-        'closes': Series(closes),
-        'action': Series(action),
-        'buys' : Series(buys),
-        'sells': Series(sells)
-    }
-    sss = DataFrame(sss)
-
-    buyin = [None]
-    sellin = [None]
-    buyout = [None]
-    sellout = [None]
-    totalreturn = 0
-    totalreturnlist = [0]
-    for i in range(1,len(sss)):
-        if sss.loc[i-1,'action'] == 0:
-            buyin.append(sss.loc[i,'buys'])
-            sellout.append(sss.loc[i,'sells'])
-            sellin.append(None)
-            buyout.append(None)
-            totalreturn += sss.loc[i,'sells'] - sss.loc[i,'buys'] -2
-        if sss.loc[i-1,'action'] == 1:
-            sellin.append(sss.loc[i,'buys'])
-            buyout.append(sss.loc[i,'sells'])
-            buyin.append(None)
-            sellout.append(None)
-            totalreturn += sss.loc[i,'buys'] - sss.loc[i,'sells'] -2
-        if sss.loc[i-1,'action'] == 5:
-            sellin.append(None)
-            buyout.append(None)
-            buyin.append(None)
-            sellout.append(None)
-        totalreturnlist.append(totalreturn)
-
-    fig, ax1 = plt.subplots()
-    plt.title('Total Return')
-    plt.xlabel('Time')
-    ax2 = ax1.twinx()
-
-    ax1.set_ylabel('DJI index', color='tab:blue')
-    plt.axvline(x=math.ceil(len(closes)*0.6), ymin=0, ymax=1, color = 'red')
-    plt.axvline(x=math.ceil(len(closes)*0.8), ymin=0, ymax=1, color = 'red')
-    ax1.plot(x_data, closes, color='tab:blue', alpha=0.75)
-    ax1.tick_params(axis='y', labelcolor='tab:blue')
-
-    ax2.set_ylabel('Accumulated return', color='black')
-    ax2.plot(x_data, totalreturnlist, color='black', alpha=1)
-    ax2.tick_params(axis='y', labelcolor='black')
-
-    fig.tight_layout()
-    plt.savefig(f'./reward/total_return_{mode}_{num}')
-    plt.show()
     
-    totalreward = 0
-    for i in range(math.ceil(len(sss)*0.8),len(sss)):
-        if sss.loc[i-1,'action'] == 0:
-            totalreward += sss.loc[i,'sells'] - sss.loc[i,'buys'] -2
-        if sss.loc[i-1,'action'] == 1:
-            totalreward += sss.loc[i,'buys'] - sss.loc[i,'sells'] -2
-    print('test 時間段的報酬 : '+ str(totalreward))
-    indexreturn = closes[len(closes)-1] - closes[math.ceil(len(closes)*0.8)-1]
-    print('test 時間段的指數報酬 :' + str(indexreturn))
 
 
 # In[ ]:

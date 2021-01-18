@@ -210,19 +210,19 @@ summary = pd.concat([compareprecision,comparereturn],axis = 1)
 
 
 # In[]
-sss = sss.iloc[20:,:]
-sss = sss.set_index('date')  
-sss['shiftaction'] = np.where(sss['shiftaction'] == 1,-1,1)
-sss['return'] = sss['sells']-sss['buys'] 
-sss['totalreturn'] = sss['shiftaction']*sss['return']
-sss['totalreturn_long'] = np.where(sss['shiftaction'] == 1,sss['shiftaction']*sss['return'],0)
-sss['totalreturn_short'] = np.where(sss['shiftaction'] == -1,sss['shiftaction']*sss['return'],0)
+sss1 = sss.iloc[20:,:]
+sss1 = sss1.set_index('date')  
+sss1['shiftaction'] = np.where(sss1['shiftaction'] == 1,-1,1)
+sss1['return'] = sss1['sells']-sss1['buys'] 
+sss1['totalreturn'] = sss1['shiftaction']*sss1['return']
+sss1['totalreturn_long'] = np.where(sss1['shiftaction'] == 1,sss1['shiftaction']*sss1['return'],0)
+sss1['totalreturn_short'] = np.where(sss1['shiftaction'] == -1,sss1['shiftaction']*sss1['return'],0)
 
 yearlist = [i for i in range(2007,2021)]
 years = []
 long_times_list,short_times_list,average_long,average_short,years_total_profit = [],[],[],[],[]
 for i in range(2007,2021):
-    years.append(sss[(str(i)<sss.index)&(sss.index<str(i+1))])
+    years.append(sss1[(str(i)<sss1.index)&(sss1.index<str(i+1))])
 for i in range(len(years)):
     years_total_profit.append(round(sum(years[i]['totalreturn']),2))
     long_times = years[i]['shiftaction'].value_counts()[1]
@@ -238,35 +238,36 @@ year_stat = year_stat.set_index('年度')
 
 
 # In[]
-sss = sss.set_index('date')
-precisiondf = sss.iloc[20:,-2:]
+sss2 = sss.iloc[20:,:]
+sss2 = sss2.set_index('date')
+sss2['correct'] = np.where(sss2['signal'] == sss2['shiftaction'],1,0)
+sss2['false'] = np.where(sss2['signal'] + sss2['shiftaction'] == 1,1,0)
+sss2['equal'] = np.where(sss2['signal'] == 3,1,0)
+sss2['totalreturn'] = sss1['totalreturn']
+sss2['correctreturn'] = sss2['correct']*sss2['totalreturn']
+sss2['falsereturn'] = sss2['false']*sss2['totalreturn']
+sss2['equalreturn'] = sss2['equal']*sss2['totalreturn']
 
 years = []
+correctlist,falselist,equallist,precision,correctreturnlist,falsereturnlist,correctreturn_meanlist,falsereturn_meanlist = [],[],[],[],[],[],[],[]
 for i in range(2007,2021):
-    years.append(precisiondf[(str(i)<precisiondf.index)&(precisiondf.index<str(i+1))])
-a = []
-correct = 0
-false = 0
-equal = 0
+    years.append(sss2[(str(i)<sss2.index)&(sss2.index<str(i+1))])
 for i in range(len(years)):
-    if years.loc[i,'signal'] == 1:
-        if precisiondf.loc[i,'shiftaction'] == 1:
-            a.append('Correct')
-        else:
-            a.append('False')
-    if precisiondf.loc[i,'signal'] == 0:
-        if precisiondf.loc[i,'shiftaction'] == 0:
-            a.append('Correct')
-        else:
-            a.append('False')
-    if precisiondf.loc[i,'signal'] == 3:
-        a.append('Equal')
-precisiondf['compare'] = a
-compareprecision = DataFrame(columns=['Correct', 'False','Equal'],index=['train','valid','test'])
-aa = precisiondf['compare'][:math.ceil(len(precisiondf)*0.6)].value_counts()
-bb = precisiondf['compare'][math.ceil(len(precisiondf)*0.6):math.ceil(len(precisiondf)*0.8)].value_counts()
-cc = precisiondf['compare'][math.ceil(len(precisiondf)*0.8):].value_counts()
-compareprecision['Correct'] = [aa['Correct'],bb['Correct'],cc['Correct']]
-compareprecision['False'] = [aa['False'],bb['False'],cc['False']]
-compareprecision['Equal'] = [aa['Equal'],bb['Equal'],cc['Equal']]
-compareprecision['Precision'] = (compareprecision['Correct'] + compareprecision['Equal'])/(compareprecision['Correct'] + compareprecision['False'] + compareprecision['Equal'])   
+    correct = sum(years[i]['correct'])
+    false = sum(years[i]['false'])
+    equal = sum(years[i]['equal'])
+    correctreturn = sum(years[i]['correctreturn'])
+    falsereturn = sum(years[i]['falsereturn'])
+    correctlist.append(correct)
+    falselist.append(false)
+    equallist.append(equal)
+    precision.append((correct+equal)/(correct+equal+false))
+    correctreturnlist.append(correctreturn)
+    falsereturnlist.append(falsereturn)
+    correctreturn_meanlist.append(correctreturn/correct)
+    falsereturn_meanlist.append(falsereturn/false)
+year_precision = DataFrame(
+    {'預測正確次數':correctlist,'預測錯誤次數':falselist,'收盤價格一樣次數':equallist,
+     '準確率':precision,'預測正確的報酬':correctreturnlist,'預測正確的平均報酬':correctreturn_meanlist,
+     '預測錯誤的損失':falsereturnlist,'預測錯誤的平均損失':falsereturn_meanlist},index = yearlist)
+

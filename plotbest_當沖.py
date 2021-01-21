@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 """
 Created on Sun Jan 10 21:48:59 2021
-
 @author: user
 """
 import os
@@ -271,3 +270,8 @@ year_precision = DataFrame(
      '準確率':precision,'預測正確的報酬':correctreturnlist,'預測正確的平均報酬':correctreturn_meanlist,
      '預測錯誤的損失':falsereturnlist,'預測錯誤的平均損失':falsereturn_meanlist},index = yearlist)
 
+
+ohlc = getStockDataVec('DJI_2007', 'all')
+dji = pd.DataFrame({'date':dateid,'open':ohlc[0],'high':ohlc[1],'low':ohlc[2],'close':ohlc[3],'signal':actionlist})
+dji = dji.set_index('date')
+dji.to_csv('dji_signal.csv')

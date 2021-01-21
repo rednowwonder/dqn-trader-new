@@ -11,10 +11,9 @@ from tqdm import trange
 
 # In[2]:
 
-
 def train_function_daytrade(stockname, mode):
     window_size = 20
-    episode_count = 30
+    episode_count = 500
     agent = TrainAgent(window_size)
     data = getStockDataVec(stockname, mode)
     dataclose = data[3]

@@ -61,6 +61,7 @@ plt.legend()
 # In[7]:
 
 
+
 df_20 = pd.concat([df[20:],djiBBands],axis=1).iloc[:,:11]
 df_20.head(15)
 
@@ -71,7 +72,7 @@ df_20['sigma'].mean(),df_20['sigma'].median()
 df_return = df_20['signal_shift']*(df_20['close']-df_20['open'])
 filter = np.where((df_20['open']>df_20['upBBand'])|(df_20['open']<df_20['downBBand']),0,1)
 df_return_filter = df_return*filter
-df_return_filter.sum()
+df_return_filter[2138:2845].sum()
 
 # In[]
 result = {'profit':[],'day':[],'times':[]}
@@ -82,12 +83,12 @@ for i in trange(5,41):
         df_return = df_20['signal_shift']*(df_20['close']-df_20['open'])
         filter = np.where((df_20['open']>df_20['upBBand'])|(df_20['open']<df_20['downBBand']),0,1)
         df_return_filter = df_return*filter
-        sum = df_return_filter.sum()
+        sum = df_return_filter[2138:2845].sum()
         result['profit'] .append(sum)
         result['day'] .append(i)
         result['times'] .append(j*0.05)
 result_table = pd.DataFrame(result)
-        
+#40,3.65(all)
 # In[60]:
 df_20 = pd.concat([df[20:],bbands(dji,20,2)],axis=1).iloc[:,:10]
 def test(period,times):

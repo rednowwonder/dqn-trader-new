@@ -16,7 +16,7 @@ from agent2 import ValidationAgent
 from function import getStockDataVec, getState, formatPrice
 
 window_size = 20
-stockname = 'DJI_2007'
+stockname = 'DJI_latest'
 agent = ValidationAgent(window_size,220,True)#,True
 #print(agent.policy_net)
 data = getStockDataVec(stockname,'all')
@@ -31,7 +31,7 @@ buys = window_size*[None]
 sells = window_size*[None]
 capital = 100000
 tradenum = 0
-actionlist = (window_size - 1)*[5]  
+actionlist = (window_size - 1)*[5]
 
 dateid = []
 lines = open("data/" + stockname + ".csv", "r").read().splitlines()
@@ -91,6 +91,7 @@ buyout = [None]
 sellout = [None]
 totalreturn = 0
 totalreturnlist = [0]
+dayreturnlist = [0]
 for i in range(1,len(sss)):
     if sss.loc[i-1,'action'] == 0:
         buyin.append(sss.loc[i,'buys'])
@@ -98,27 +99,30 @@ for i in range(1,len(sss)):
         sellin.append(None)
         buyout.append(None)
         totalreturn += sss.loc[i,'sells'] - sss.loc[i,'buys'] -2
+        dayreturnlist.append(sss.loc[i,'sells'] - sss.loc[i,'buys'] -2)
     if sss.loc[i-1,'action'] == 1:
         sellin.append(sss.loc[i,'buys'])
         buyout.append(sss.loc[i,'sells'])
         buyin.append(None)
         sellout.append(None)
         totalreturn += sss.loc[i,'buys'] - sss.loc[i,'sells'] -2
+        dayreturnlist.append(sss.loc[i,'buys'] - sss.loc[i,'sells'] -2)
     if sss.loc[i-1,'action'] == 5:
         sellin.append(None)
         buyout.append(None)
         buyin.append(None)
         sellout.append(None)
+        dayreturnlist.append(0)
     totalreturnlist.append(totalreturn)
     
 df =  DataFrame({'date' : dateid,'DJI_closes' : dataclose,'totalreturn' : totalreturnlist})
 df = df.set_index('date')
 df.plot(grid=1,figsize=(12,9),title='Dow Jones Index')
-#df['closes'].plot(grid=1,figsize=(12,9),title=f'{stockname} index')
-#df['totalreturn'].plot(grid=1,figsize=(12,9))
 plt.axvline(x=math.ceil(len(dataclose)*0.6), ymin=0, ymax=1, color = 'red')
 plt.axvline(x=math.ceil(len(dataclose)*0.8), ymin=0, ymax=1, color = 'red')
 plt.show()
+
+df[(df.index>'2020-01-01')&(df.index<'2020-06-30')].plot(grid=1,figsize=(12,9),title='Dow Jones Index')
 
 actsignal = DataFrame({'date':dateid,'actsignal':actionlist})
 actsignal = actsignal.set_index('date')
@@ -275,3 +279,16 @@ ohlc = getStockDataVec('DJI_2007', 'all')
 dji = pd.DataFrame({'date':dateid,'open':ohlc[0],'high':ohlc[1],'low':ohlc[2],'close':ohlc[3],'signal':actionlist})
 dji = dji.set_index('date')
 dji.to_csv('dji_signal.csv')
+
+
+
+# In[]
+dic = {1:'-1', 0:'1'}
+signal = [dic.get(n, n) for n in actionlist]
+
+
+
+traderecord = pd.DataFrame({'open':dataopen,'close':dataclose,'close-open':[dataclose[i] - dataopen[i] for i in range(len(dataopen))],
+                            'totalreturn':totalreturnlist,'signal':signal,'dailyreturn':dayreturnlist
+                            },index = dateid)
+

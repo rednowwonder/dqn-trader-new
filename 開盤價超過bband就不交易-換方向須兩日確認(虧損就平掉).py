@@ -73,6 +73,7 @@ df_return = df_20['signal_shift']*(df_20['close']-df_20['open'])
 filter = np.where((df_20['open']>df_20['upBBand'])|(df_20['open']<df_20['downBBand']),0,1)
 df_return_filter = df_return*filter
 df_return_filter[2138:2845].sum()
+df_return.sum()
 
 # In[]
 result = {'profit':[],'day':[],'times':[]}
@@ -306,25 +307,6 @@ for j in trange(5,40):
             print('wrong')
 ttt = pd.DataFrame(t,columns=[str(i) for i in range(12)])
 
-# In[23]:
-
-
-for j in range(5,40):
-    for i in range(32,33):
-        if test(j,0.1*i)[0][-1][3]==0:
-            print(test(j,0.1*i)[0][-1],j,i,-1)
-        elif test(j,0.1*i)[0][-2][3]==0:
-            print(test(j,0.1*i)[0][-2],j,i,-2)
-        elif test(j,0.1*i)[0][-3][3]==0:
-            print(test(j,0.1*i)[0][-3],j,i,-3)
-        elif test(j,0.1*i)[0][-4][3]==0:
-            print(test(j,0.1*i)[0][-4],j,i,-4)
-        elif test(j,0.1*i)[0][-5][3]==0:
-            print(test(j,0.1*i)[0][-5],j,i,-5)
-        else:
-            print('wrong')
-
-
 # In[41]:
 
 
@@ -332,12 +314,12 @@ plt.plot(dji,label="Close",color='k')
 #plt.rcParams['font.sans-serif'] = ['simhei']
 plt.plot(djiBBands.upBBand,
          label="upBBand",color='b',
-         linesdjile='dashed')
+         linestyle='dashed')
 plt.plot(djiBBands.midBBand,
-         label="midBBand",color='r',linesdjile='-')
+         label="midBBand",color='r',linestyle='-')
 plt.plot(djiBBands.downBBand,
          label="downBBand",color='b',
-         linesdjile='dashed')
+         linestyle='dashed')
 plt.xticks(rotation=45)
 plt.title("2019-2020djibband")
 plt.legend()
@@ -582,7 +564,5 @@ plt.rcParams["figure.figsize"] = (10, 8)
 
 
 # In[ ]:
-
-
 
 
